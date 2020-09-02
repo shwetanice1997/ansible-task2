@@ -1,0 +1,55 @@
+- hosts: all
+  name: Configuring Apache Server on AWS  
+  tasks:
+    - name: Installing Apache HTTPD
+      package: 
+        name: httpd
+        state: present
+      become: true
+      become_user: root
+      become_method: sudo
+      register: x
+    
+    - name: Creating Document Root
+      file:
+        state: directory
+        dest: "/var/www/Shweta"
+      become: true
+      become_user: root
+      become_method: sudo
+      register: y
+
+    - name: Configuring Apache Server
+      template:
+        dest: "/etc/httpd/conf.d/shweta.conf"
+        src: "/task2/shweta.conf"
+      become: true
+      become_user: root
+      become_method: sudo
+      when: x.rc == 0
+      notify: service httpd
+    
+    - name: service httpd
+      service:
+        name: "httpd"
+        state: restarted
+      become: true
+      become_user: root
+      become_method: sudo
+
+    - name: Retrieving webpage from GitHub
+      get_url:
+        dest: "/var/www/Shweta"
+        url: "https://raw.githubusercontent.com/shwetanice1997/ansible-task2/master/index.html"
+      become: true
+      become_user: root
+      become_method: sudo
+      when: y.failed == false
+
+    - name: Starting httpd services
+      service: 
+        name: "httpd"
+        state: started
+      become: true
+      become_user: root
+      become_method: sudo
