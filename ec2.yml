@@ -1,0 +1,25 @@
+- hosts: localhost
+  vars_files:
+          - secure.yml
+  tasks:
+  - name: provision os in aws
+    ec2:
+      key_name: "mykey18"
+      instance_type: "t2.micro"
+      image: "ami-0ebc1ac48dfd14136"
+      wait: yes
+      count: 1
+      instance_tags:
+            Name: Ansible_webos
+      vpc_subnet_id: "subnet-ff272b97"
+      assign_public_ip: yes
+      region: "ap-south-1"
+      state: present
+      group_id: "sg-ab7e0ecf"
+      aws_access_key: "{{ myuser }}"
+      aws_secret_key: "{{ mypass }}"
+
+    register: x
+  - debug:
+          var: x
+
